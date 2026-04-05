@@ -1,39 +1,89 @@
 <x-app-layout>
 
 <!-- Hero Section -->
-<section class="relative bg-gradient-to-br from-gray-900 via-gray-800 to-orange-900 text-white overflow-hidden">
-    <div class="absolute inset-0 opacity-20">
-        <div class="absolute inset-0 bg-gradient-to-r from-orange-500/30 to-transparent"></div>
+<section
+    x-data="{
+        current: 0,
+        slides: [
+            { img: 'https://i.pinimg.com/originals/d0/03/99/d003997791e417b9c492486f18ded99a.jpg', alt: 'Deserto do Namibe, Angola' },
+            { img: 'https://blog.melhorseguro.com.br/wp-content/uploads/2025/03/Design-sem-nome-2025-03-08T215209.973.png', alt: 'Costa de Benguela, Angola' },
+            { img: 'https://i.pinimg.com/originals/54/f4/10/54f4106070dd579916e4f8304aa357f8.png', alt: 'Planalto do Huambo, Angola' }
+        ],
+        init() {
+            setInterval(() => { this.current = (this.current + 1) % this.slides.length; }, 5000);
+        }
+    }"
+    class="relative text-white overflow-hidden">
+
+    <!-- Carousel Slides (background) -->
+    <div class="absolute inset-0">
+        <template x-for="(slide, index) in slides" :key="index">
+            <div
+                x-show="current === index"
+                x-transition:enter="transition-opacity ease-in-out duration-1000"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition-opacity ease-in-out duration-1000"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="absolute inset-0">
+                <img :src="slide.img" :alt="slide.alt" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-br from-gray-900/75 via-gray-800/55 to-orange-900/65"></div>
+            </div>
+        </template>
     </div>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-36 relative z-10">
-        <div class="max-w-3xl">
-            <div class="inline-flex items-center gap-2 bg-orange-500/20 text-orange-300 rounded-full px-4 py-1.5 text-sm font-medium mb-6 border border-orange-500/30">
-                <i class="fas fa-map-marker-alt"></i>
-                Turismo em Angola
-            </div>
-            <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-6">
-                Descubra a <span class="text-orange-400">Beleza</span><br>
-                de Angola
-            </h1>
-            <p class="text-lg md:text-xl text-gray-300 mb-8 leading-relaxed">
-                Explore destinos únicos de Luanda ao Namibe, aventuras no Huambo, cultura no Malanje e
-                muito mais. Angola espera por si.
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4">
-                <a href="{{ route('tours.index') }}" class="inline-flex items-center justify-center gap-2 bg-orange-500 text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-orange-600 transition text-lg">
-                    <i class="fas fa-search"></i>Explorar Tours
-                </a>
-                @guest
-                    <a href="{{ route('register') }}" class="inline-flex items-center justify-center gap-2 border border-white/30 text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-white/10 transition text-lg">
-                        <i class="fas fa-user-plus"></i>Criar Conta
+
+    <!-- Content + carousel controls (relative wrapper excludes stats bar) -->
+    <div class="relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-36 relative z-10">
+            <div class="max-w-3xl">
+                <div class="inline-flex items-center gap-2 bg-orange-500/20 text-orange-300 rounded-full px-4 py-1.5 text-sm font-medium mb-6 border border-orange-500/30">
+                    <i class="fas fa-map-marker-alt"></i>
+                    Turismo em Angola
+                </div>
+                <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-6">
+                    Descubra a <span class="text-orange-400">Beleza</span><br>
+                    de Angola
+                </h1>
+                <p class="text-lg md:text-xl text-gray-300 mb-8 leading-relaxed">
+                    Explore destinos únicos de Luanda ao Namibe, aventuras no Huambo, cultura no Malanje e
+                    muito mais. Angola espera por si.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="{{ route('tours.index') }}" class="inline-flex items-center justify-center gap-2 bg-orange-500 text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-orange-600 transition text-lg">
+                        <i class="fas fa-search"></i>Explorar Tours
                     </a>
-                @endguest
+                    @guest
+                        <a href="{{ route('register') }}" class="inline-flex items-center justify-center gap-2 border border-white/30 text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-white/10 transition text-lg">
+                            <i class="fas fa-user-plus"></i>Criar Conta
+                        </a>
+                    @endguest
+                </div>
             </div>
+        </div>
+
+        <!-- Prev / Next Arrows -->
+        <button @click="current = (current - 1 + slides.length) % slides.length"
+                class="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-black/30 hover:bg-black/60 rounded-full flex items-center justify-center transition-colors">
+            <i class="fas fa-chevron-left text-sm"></i>
+        </button>
+        <button @click="current = (current + 1) % slides.length"
+                class="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-black/30 hover:bg-black/60 rounded-full flex items-center justify-center transition-colors">
+            <i class="fas fa-chevron-right text-sm"></i>
+        </button>
+
+        <!-- Dot Indicators -->
+        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+            <template x-for="(slide, index) in slides" :key="index">
+                <button @click="current = index"
+                        :class="current === index ? 'bg-orange-500 w-6' : 'bg-white/50 hover:bg-white/80 w-2.5'"
+                        class="h-2.5 rounded-full transition-all duration-300"></button>
+            </template>
         </div>
     </div>
 
     <!-- Stats bar -->
-    <div class="border-t border-white/10 bg-black/20">
+    <div class="border-t border-white/10 bg-black/20 relative z-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
             <div class="grid grid-cols-3 gap-4 text-center">
                 <div>
