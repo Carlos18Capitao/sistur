@@ -1,25 +1,33 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
+    <div class="text-center mb-6">
+        <div class="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <i class="fas fa-lock text-orange-500 text-xl"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-900">Esqueceu a palavra-passe?</h2>
+        <p class="text-sm text-gray-500 mt-1">Indique o seu email e enviaremos um link para redefinir a sua palavra-passe.</p>
     </div>
 
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <form method="POST" action="{{ route('password.email') }}">
+    <form method="POST" action="{{ route('password.email') }}" class="space-y-5">
         @csrf
 
-        <!-- Email Address -->
+        <!-- Email -->
         <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            <x-input-label for="email" value="Email" />
+            <x-text-input id="email" type="email" name="email" :value="old('email')" required autofocus placeholder="seu@email.com" />
+            <x-input-error :messages="$errors->get('email')" class="mt-1" />
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
-        </div>
+        <x-primary-button>
+            <i class="fas fa-paper-plane mr-2"></i> Enviar link de recuperação
+        </x-primary-button>
+
+        <p class="text-center text-sm text-gray-500">
+            <a href="{{ route('login') }}" class="text-orange-500 hover:text-orange-600 font-semibold">
+                <i class="fas fa-arrow-left mr-1"></i> Voltar ao login
+            </a>
+        </p>
     </form>
 </x-guest-layout>
