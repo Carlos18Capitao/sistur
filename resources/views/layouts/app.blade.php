@@ -19,6 +19,7 @@
         }
     </script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="icon" type="image/png" href="/images/Sistur-logo.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         [x-cloak]{display:none!important}
@@ -32,10 +33,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
             <a href="{{ route('home') }}" class="flex items-center gap-2">
-                <div class="w-9 h-9 bg-orange-500 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-globe-africa text-white text-lg"></i>
-                </div>
-                <span class="text-xl font-bold text-gray-900">Sis<span class="text-orange-500">tur</span></span>
+                <img src="/images/Sistur-logo.png" alt="Sistur" class="h-10">
             </a>
             <div class="hidden md:flex items-center gap-6">
                 <a href="{{ route('home') }}" class="text-gray-600 hover:text-orange-500 transition font-medium">Início</a>
@@ -103,8 +101,7 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div class="md:col-span-2">
                 <div class="flex items-center gap-2 mb-4">
-                    <div class="w-9 h-9 bg-orange-500 rounded-lg flex items-center justify-center"><i class="fas fa-globe-africa text-white text-lg"></i></div>
-                    <span class="text-xl font-bold text-white">Sis<span class="text-orange-400">tur</span></span>
+                    <img src="/images/Sistur-logo.png" alt="Sistur" class="h-[60px]">
                 </div>
                 <p class="text-gray-400 text-sm leading-relaxed max-w-xs">Descubra a beleza de Angola através de experiências turísticas únicas e inesquecíveis.</p>
                 <div class="flex gap-3 mt-4">

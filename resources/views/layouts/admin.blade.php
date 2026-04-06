@@ -17,10 +17,8 @@
     <aside class="w-64 bg-gray-900 text-white flex-shrink-0 flex flex-col hidden md:flex">
         <div class="p-5 border-b border-gray-700">
             <a href="{{ route('home') }}" class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-globe-africa text-white"></i>
-                </div>
-                <span class="font-bold text-lg">Sis<span class="text-orange-400">tur</span> <span class="text-gray-400 text-sm font-normal">Admin</span></span>
+                <img src="/images/Sistur-logo.png" alt="Sistur" class="h-12">
+                <span class="text-gray-400 text-sm font-normal">Admin</span>
             </a>
         </div>
 
