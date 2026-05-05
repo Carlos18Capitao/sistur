@@ -1,0 +1,88 @@
+name: Deploy to DreamHost
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, bcmath, pdo_mysql, xml, curl, zip
+          coverage: none
+
+      - name: Instalar dependências PHP (produção)
+        run: composer install --no-dev --optimize-autoloader --no-interaction
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Instalar dependências JS e compilar assets
+        run: |
+          npm ci
+          npm run build
+
+      - name: Adicionar chave SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Sincronizar ficheiros para o servidor
+        run: |
+          rsync -az --delete \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='docker' \
+            --exclude='docker-compose.yml' \
+            --exclude='.env' \
+            --exclude='storage/logs' \
+            --exclude='storage/framework/cache' \
+            --exclude='storage/framework/sessions' \
+            --exclude='storage/framework/views' \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            ./ dh_3w7gcc@ams1-shared-01.dreamhost.com:/home/dh_3w7gcc/cc-computacao.com/
+
+      - name: Executar comandos pós-deploy no servidor
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ams1-shared-01.dreamhost.com
+          username: dh_3w7gcc
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/dh_3w7gcc/cc-computacao.com
+
+            # Gera APP_KEY se ainda não existir no .env
+            php artisan key:generate --force --no-interaction 2>/dev/null || true
+
+            # Cria pastas de storage necessárias
+            mkdir -p storage/framework/{sessions,views,cache}
+            mkdir -p storage/logs
+            chmod -R 775 storage bootstrap/cache
+
+            # Cria symlink storage → public/storage
+            php artisan storage:link --force
+
+            # Corre migrações
+            php artisan migrate --force --no-interaction
+
+            # Limpa e reconstrói caches de produção
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan event:cache
+
+            echo "Deploy concluído com sucesso."
