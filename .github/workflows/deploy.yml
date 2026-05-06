@@ -34,10 +34,12 @@ jobs:
           npm ci
           npm run build
 
-      - name: Adicionar chave SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Preparar chave SSH para rsync
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ams1-shared-01.dreamhost.com >> ~/.ssh/known_hosts
 
       - name: Sincronizar ficheiros para o servidor
         run: |
@@ -50,7 +52,7 @@ jobs:
             --exclude='.env' \
             --exclude='storage' \
             --exclude='bootstrap/cache' \
-            -e "ssh -o StrictHostKeyChecking=no" \
+            -e "ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" \
             ./ dh_3w7gcc@ams1-shared-01.dreamhost.com:/home/dh_3w7gcc/cc-computacao.com/
 
       - name: Executar comandos pós-deploy no servidor
