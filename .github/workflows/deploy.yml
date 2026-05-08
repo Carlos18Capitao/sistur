@@ -41,8 +41,8 @@ jobs:
       - name: Preparar chave SSH para rsync
         run: |
           mkdir -p ~/.ssh
-          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/authorized_keys
-          chmod 600 ~/.ssh/authorized_keys
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H ams1-shared-01.dreamhost.com >> ~/.ssh/known_hosts
 
       - name: Sincronizar ficheiros para o servidor
@@ -56,8 +56,8 @@ jobs:
             --exclude='.env' \
             --exclude='storage' \
             --exclude='bootstrap/cache' \
-            -e "ssh -i ~/.ssh/authorized_keys -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" \
-            ./ dh_3w7gcc@ams1-shared-01.dreamhost.com:/home/dh_3w7gcc/cc-computacao.com/
+            -e "ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" \
+            ./ dh_3w7gcc@ams1-shared-01.dreamhost.com:/home/dh_3w7gcc/cc-computacao.com/sistur/
 
       - name: Executar comandos pós-deploy no servidor
         uses: appleboy/ssh-action@v1
@@ -66,7 +66,7 @@ jobs:
           username: dh_3w7gcc
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /home/dh_3w7gcc/cc-computacao.com
+            cd /home/dh_3w7gcc/cc-computacao.com/sistur
 
             # Criar/actualizar .env de produção a partir dos segredos do deploy
             # Nota: GitHub Actions expande ${{ secrets.* }} antes do envio por SSH
@@ -115,15 +115,15 @@ jobs:
             chmod -R 755 storage bootstrap/cache
 
             # Cria symlink storage → public/storage
-            php artisan storage:link --force
+            /usr/local/php83/bin/php artisan storage:link --force
 
             # Corre migrações
-            php artisan migrate --force --no-interaction
+            /usr/local/php83/bin/php artisan migrate --force --no-interaction
 
             # Limpa e reconstrói caches de produção
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
-            php artisan event:cache
+            /usr/local/php83/bin/php artisan config:cache
+            /usr/local/php83/bin/php artisan route:cache
+            /usr/local/php83/bin/php artisan view:cache
+            /usr/local/php83/bin/php artisan event:cache
 
             echo "Deploy concluído com sucesso."
